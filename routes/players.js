@@ -3,7 +3,9 @@ const router = express.Router();
 const playersController = require("../controllers/players");
 
 router.get("/", playersController.index);
-router.get("/:gameId", playersController.show);
+router.get("/:id", playersController.show)
+router.get("/game/:gameId", playersController.showByGameId);
 router.post("/", playersController.create);
+router.put("/:id", playersController.update);
 
 module.exports = router;
