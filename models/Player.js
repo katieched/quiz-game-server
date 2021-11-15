@@ -23,6 +23,20 @@ class Player {
         });
     };
 
+    // Get player by ID
+    static findById(id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const db = await init();
+                const data = await db.collection("players").find({ _id: ObjectId(id) }).toArray();
+                const player = new Player({ ...data[0], id: data[0]._id });
+                resolve(player);
+            } catch(err) {
+                reject(`Error retrieving player ${id}`);
+            };
+        });
+    };
+
     // Get players by game ID
     static findByGameId(gameId) {
         return new Promise(async (resolve, reject) => {
@@ -36,8 +50,38 @@ class Player {
             };
         });
     };
+
+    // Create new player
+    static createPlayer(data) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const db = await init();
+                const { name, gameId, score } = data;
+                let playerData = await db.collection("players").insertOne({ name: name, gameId: ObjectId(gameId), score: score });
+                console.log(playerData);
+                let newPlayer = new Player(playerData.ops[0]);
+                resolve(newPlayer);
+            } catch (err) {
+                reject("Error creating new player");
+            };
+        });
+    };
+
+    // Update player's score
+    updatePlayer() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const db = await init();
+                const updatedPlayerData = await db.collection("players").findOneAndUpdate({ id: ObjectId(this.id) }, { $inc: { score: 100 } }, { returnOriginal: false});
+                let updatedPlayer = new Player(updatedPlayerData.value);
+                console.log(updatedPlayer);
+                resolve(updatedPlayer);
+                
+            } catch(err) {
+                reject(`Player ${this.id} could not be updated`);
+            };
+        });
+    };
 };
 
 module.exports = Player;
-
-// db.players.find({ gameId: ObjectId('619243da0a71210ff02646d8') });
