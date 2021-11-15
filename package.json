@@ -1,0 +1,37 @@
+{
+  "name": "quiz-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --setupFiles ./tests/integration/config.js --watchAll --detectOpenHandles --runInBand --verbose",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "coverage": "jest --testPathPattern=/unit/ --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/katieched/quiz-game-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/katieched/quiz-game-server/issues"
+  },
+  "homepage": "https://github.com/katieched/quiz-game-server#readme",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongodb": "^4.1.4",
+    "socket.io": "^4.3.2"
+  },
+  "devDependencies": {
+    "coverage": "^0.4.1",
+    "jest": "^27.3.1",
+    "nodemon": "^2.0.15",
+    "supertest": "^6.1.6"
+  }
+}
