@@ -7,8 +7,10 @@ server.use(express.json());
 
 server.get('/', (req, res) => res.send('Welcome to the quiz game!'));
 
+const gamesRoutes = require("./routes/games");
 const playersRoutes = require("./routes/players");
-server.use("/players", playersRoutes);
 
+server.use("/games", gamesRoutes);
+server.use("/players", playersRoutes);
 
 module.exports = server;
