@@ -3,9 +3,9 @@ const { ObjectId } = require("mongodb");
 
 class Player {
     constructor(data) {
-        this.id = data.id;
+        this.id = data._id;
         this.name = data.name;
-        this.gameId = data.game_id;
+        this.gameId = data.gameId;
         this.score = data.score;
     };
 
@@ -28,8 +28,8 @@ class Player {
         return new Promise(async (resolve, reject) => {
             try {
                 const db = await init();
-                const data = await db.collection("players").find({ game_id: gameId }).toArray();
-                const players = data.map(p => new Player({ ...p }));
+                const data = await db.collection("players").find({ gameId: ObjectId(gameId) }).toArray();
+                const players = data.map(p => new Player({ ...p, gameId: p.gameId }));
                 resolve(players);
             } catch (err) {
                 reject(`Players from game ${gameId} not found`);
@@ -39,3 +39,5 @@ class Player {
 };
 
 module.exports = Player;
+
+// db.players.find({ gameId: ObjectId('619243da0a71210ff02646d8') });
