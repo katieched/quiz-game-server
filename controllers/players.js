@@ -20,4 +20,14 @@ async function show(req, res) {
     };
 };
 
-module.exports = { index, show };
+// Create route
+async function create(req, res) {
+    try {
+        const newPlayer = await Player.createPlayer(req.body);
+        res.status(201).json({ Player: newPlayer });
+    } catch (err) {
+        res.status(422).json(err);
+    };
+};
+
+module.exports = { index, show, create };

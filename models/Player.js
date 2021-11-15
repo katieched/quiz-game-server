@@ -36,8 +36,22 @@ class Player {
             };
         });
     };
+
+    // Create new player
+    static createPlayer(data) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const db = await init();
+                const { name, gameId, score } = data;
+                let playerData = await db.collection("players").insertOne({ name: name, gameId: ObjectId(gameId), score: score });
+                console.log(playerData);
+                let newPlayer = new Player(playerData.ops[0]);
+                resolve(newPlayer);
+            } catch (err) {
+                reject("Error creating new player");
+            };
+        });
+    };
 };
 
 module.exports = Player;
-
-// db.players.find({ gameId: ObjectId('619243da0a71210ff02646d8') });
