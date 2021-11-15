@@ -1,12 +1,12 @@
 const { init } = require("../dbConfig");
 const { ObjectId } = require("mongodb");
-const { diff } = require("jest-diff");
 
 class Game {
     constructor(data) {
         this.id = data._id;
         this.difficulty = data.difficulty;
         this.category = data.category;
+        this.players = data.players;
     };
 
     // Get all games
@@ -19,6 +19,20 @@ class Game {
                 resolve(games);
             } catch (err) {
                 reject("Error retrieving games");
+            };
+        });
+    };
+
+    // Get all players in every game
+    static get allPlayers() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const db = await init();
+                const data = await db.collection("games").find().toArray();
+                const players = data.map(g => new Game({ _id: g._id, players: g.players }));
+                resolve(players);
+            } catch (err) {
+                reject("Error retrieving players");
             };
         });
     };
@@ -38,12 +52,11 @@ class Game {
     };
 
     // Create new game
-    static createGame(data) {
+    static createGame(difficulty, category, players) {
         return new Promise(async (resolve, reject) => {
             try {
                 const db = await init();
-                const { difficulty, category } = data;
-                let gameData = await db.collection('games').insertOne({ difficulty: difficulty, category: category });
+                let gameData = await db.collection('games').insertOne({ difficulty: difficulty, category: category, players: players });
                 let newGame = new Game(gameData.ops[0]);
                 resolve(newGame);
             } catch (err) {

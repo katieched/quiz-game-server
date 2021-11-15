@@ -1,10 +1,19 @@
 const Game = require("../models/Game");
 
-// Index route
+// Index routes
 async function index(req, res) {
     try {
         const allGames = await Game.all;
         res.json({ Games: allGames });
+    } catch (err) {
+        res.status(500).json(err);
+    };
+};
+
+async function indexPlayers(req, res) {
+    try {
+        const allPlayers = await Game.allPlayers;
+        res.json({ Players: allPlayers });
     } catch (err) {
         res.status(500).json(err);
     };
@@ -23,7 +32,8 @@ async function show(req, res) {
 // Create route
 async function create(req, res) {
     try {
-        const newGame = await Game.createGame(req.body);
+        const { difficulty, category, players } = req.body;
+        const newGame = await Game.createGame(difficulty, category, players);
         res.status(201).json({ Game: newGame });
     } catch (err) {
         res.status(422).json(err);
@@ -41,4 +51,4 @@ async function destroy(req, res) {
     };
 };
 
-module.exports = { index, show, create, destroy };
+module.exports = { index, indexPlayers, show, create, destroy };
