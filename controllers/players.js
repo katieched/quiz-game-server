@@ -13,7 +13,7 @@ async function index(req, res) {
 // Show route
 async function show(req, res) {
     try {
-        const players = await Player.findByGameId(req.params.id);
+        const players = await Player.findByGameId(req.params.gameId);
         res.json({ Players: players });
     } catch (err) {
         res.status(404).json(err);
