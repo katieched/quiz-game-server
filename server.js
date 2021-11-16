@@ -1,14 +1,17 @@
 const express = require("express");
 const cors = require("cors");
 
-const server = express();
-server.use(cors());
-server.use(express.json());
+const { app, server, io, initialise } = require("./socket/server");
 
-server.get('/', (req, res) => res.send('Welcome to the quiz game!'));
+app.use(cors());
+app.use(express.json());
+
+app.get('/', (req, res) => res.send('Welcome to the quiz game!'));
 
 const gamesRoutes = require("./routes/games");
 
-server.use("/games", gamesRoutes);
+app.use("/games", gamesRoutes);
+
+io.on("connection", socket => initialise(socket));
 
 module.exports = server;
