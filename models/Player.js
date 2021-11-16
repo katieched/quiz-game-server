@@ -8,21 +8,6 @@ class Player {
         this.score = data.score;
     };
 
-   
-//     // Get player by ID
-//     static findById(id) {
-//         return new Promise(async (resolve, reject) => {
-//             try {
-//                 const db = await init();
-//                 const data = await db.collection("players").find({ _id: ObjectId(id) }).toArray();
-//                 const player = new Player({ ...data[0], id: data[0]._id });
-//                 resolve(player);
-//             } catch(err) {
-//                 reject(`Error retrieving player ${id}`);
-//             };
-//         });
-//     };
-
 //     // Update player's score
 //     updatePlayer() {
 //         return new Promise(async (resolve, reject) => {
@@ -38,6 +23,8 @@ class Player {
 //             };
 //         });
 //     };
+
+// Delete
  };
 
  module.exports = Player;
