@@ -19,7 +19,7 @@ async function indexPlayers(req, res) {
     };
 };
 
-// Show route
+// Show routes
 async function show(req, res) {
     try {
         const game = await Game.findById(req.params.id);
@@ -29,7 +29,17 @@ async function show(req, res) {
     };
 };
 
-// Create route
+async function showPlayer(req, res) {
+    try {
+        const game = await Game.findById(req.params.id);
+        const player = await game.findPlayerByName(req.params.name);
+        res.json({ Player: player });
+    } catch(err) {
+        res.status(404).json(err);
+    }
+}
+
+// Create routes
 async function create(req, res) {
     try {
         const { difficulty, category, players } = req.body;
@@ -39,6 +49,16 @@ async function create(req, res) {
         res.status(422).json(err);
     };
 };
+
+async function createPlayer(req, res) {
+    try {
+        const { name } = req.body;
+        const newPlayer = await Game.createPlayer(name, req.params.id);
+        res.status(201).json({ Player: newPlayer });
+    } catch(err) {
+        res.status(422).json(err);
+    };
+}
 
 // Delete route
 async function destroy(req, res) {
@@ -51,4 +71,4 @@ async function destroy(req, res) {
     };
 };
 
-module.exports = { index, indexPlayers, show, create, destroy };
+module.exports = { index, indexPlayers, show, showPlayer, create, createPlayer, destroy };
