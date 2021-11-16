@@ -51,6 +51,24 @@ class Game {
         });
     };
 
+    // Get player by name and gameId
+   findPlayerByName(name) {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        const db = await init();
+                        const data = await db.collection("games").find( { "players.name": this.name } ).toArray();
+                        // const data = await db.collection("games").aggregate({ $unwind: "$players" }, { $match: { name: this.name } } );
+                        // const data = await db.collection("games").findOne( { players: { "$elemMatch": { "$in": [this.name] } } } ).toArray();
+                        console.log(data);
+                        const index = data[0].players.indexOf(this.name);
+                        let player = new Game({ "players.name": data[0].players[index].name })
+                        resolve(player);
+                    } catch(err) {
+                        reject(`Error retrieving player ${name}`);
+                    };
+                });
+            };
+
     // Create new game
     static createGame(difficulty, category, players) {
         return new Promise(async (resolve, reject) => {
@@ -61,6 +79,20 @@ class Game {
                 resolve(newGame);
             } catch (err) {
                 reject("Error creating new game");
+            };
+        });
+    };
+
+    // Create new player
+    static createPlayer(name, gameId) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const db = await init();
+                let playerData = await db.collection('games').updateOne({ _id: ObjectId(gameId)}, { $push: { players: { name: name, score: 0 }}});
+                let newPlayer = new Game(playerData.ops[0]);
+                resolve(newPlayer);
+            } catch (err) {
+                reject("Error creating new player");
             };
         });
     };
