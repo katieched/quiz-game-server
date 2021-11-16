@@ -100,6 +100,43 @@ class Game {
         });
     };
 
+    // Update player's score
+    updatePlayer() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const db = await init();
+                // const updatedPlayerData = await db.collection("games").findOneAndUpdate(
+                //     { $and: [{ _id: ObjectId(this.id) }, { "name": this.name }] },
+                //     // { "name": this.name },
+                //     // { _id: ObjectId(this.id) },
+                //     { $inc: { "players[0].score": 100 } },
+                //     { returnOriginal: false }
+                // );
+
+                // const data = await db.collection("games").find(
+                //     { $and: [{ _id: ObjectId(this.id) }, { "name": this.name }] }
+                // ).toArray();
+                // console.log("data", data)
+                // const index = data[0].players.findIndex(i => i.name === this.players.name);
+                // console.log("index", index)
+                // const player = data[0].players[index]
+                // console.log("player: ", player);
+
+                // Try and use name when increasing
+                // const updatedPlayerData = await db.collection("games").updateOne(
+                //     { $and: [{ _id: ObjectId(this.id) }, { "name": this.name }] },
+                //     { $inc: { players: { score: 100 } } }
+                // );
+                // console.log("updated", updatedPlayerData);
+                // let updatedPlayer = new Game(updatedPlayerData.ops[0]);
+                // console.log(updatedPlayer);
+                resolve(updatedPlayerData);
+            } catch (err) {
+                reject(`Player ${this.players.name} could not be updated`);
+            };
+        });
+    };
+
     // Delete game
     destroyGame() {
         return new Promise(async (resolve, reject) => {

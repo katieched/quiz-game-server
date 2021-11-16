@@ -60,6 +60,21 @@ async function createPlayer(req, res) {
     };
 }
 
+// Update route
+async function updateScore(req, res) {
+    try {
+        const game = await Game.findById(req.params.id);
+        console.log("Game", game)
+        const player = await game.findPlayerByName(req.params.name);
+        console.log("player", player)
+        const score = await player.updatePlayer();
+        console.log("score", score)
+        res.status(204).json(score);
+    } catch (err) {
+        res.status(400).json(err);
+    };
+};
+
 // Delete route
 async function destroy(req, res) {
     try {
