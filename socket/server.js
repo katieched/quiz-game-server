@@ -1,16 +1,19 @@
-const express = require("express");
-const app = express();
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
+// const express = require("express");
+// const app = express();
+
+const httpServer = require("http").createServer();
+const io = require("socket.io")(httpServer, {
     cors: {
         origin: "*",
-        methods: ["GET", "POST", "PUT", "DELETE"]
+        methods: ["GET", "POST"]
     }
 });
 
-const { Game } = require("../models/Game");
+// const { router } = require("../routes/games");
 
-function initialise(socket) {
+
+
+io.on('connection', socket => {
     console.log("'Ello, who's this we got here?"); // runs when client first connects
 
     // get total number of client connections
@@ -23,10 +26,16 @@ function initialise(socket) {
     // send event to all clients
     io.emit('Admin', `There are ${playersCount} players currently playing!`)
 
-    // Create game
-    socket.on('create game', ({ username, message }) => {
-        socket.broadcast.emit('incoming-message', { username, message })
-        socket.emit('Admin', 'message sent')
+    socket.on('create game', (roomId) => {
+        console.log('created room', roomId);
+        socket.join(roomId);
+    })
+
+    socket.on('join game', (roomId) => {
+        console.log(`joined game ${roomId.roomId}`);
+        socket.join(roomId);
+
+        io.in(roomId).emit('Admin', 'A new player has joined the game.');
     })
 
     // Join game
@@ -36,6 +45,6 @@ function initialise(socket) {
     socket.on("disconnect", socket => { // runs when client disconnects
         console.log("K bye then");
     });
-};
+});
 
-module.exports = { app, server, io, initialise };
+module.exports = httpServer;

@@ -4,6 +4,7 @@ const { ObjectId } = require("mongodb");
 class Game {
     constructor(data) {
         this.id = data._id;
+        this.gameId = data.gameId;
         this.difficulty = data.difficulty;
         this.category = data.category;
         this.players = data.players;
@@ -15,7 +16,7 @@ class Game {
             try {
                 const db = await init();
                 const data = await db.collection("games").find().toArray();
-                const games = data.map(g => new Game({ ...g, id: g._id }));
+                const games = data.map(g => new Game({ ...g, gameId: g.gameId }));
                 resolve(games);
             } catch (err) {
                 reject("Error retrieving games");
@@ -29,7 +30,7 @@ class Game {
             try {
                 const db = await init();
                 const data = await db.collection("games").find().toArray();
-                const players = data.map(g => new Game({ _id: g._id, players: g.players }));
+                const players = data.map(g => new Game({ gameId: g.gameId, players: g.players }));
                 resolve(players);
             } catch (err) {
                 reject("Error retrieving players");
@@ -38,15 +39,15 @@ class Game {
     };
 
     // Get game by ID
-    static findById(id) {
+    static findById(gameId) {
         return new Promise(async (resolve, reject) => {
             try {
                 const db = await init();
-                let data = await db.collection("games").find({ _id: ObjectId(id) }).toArray();
-                let game = new Game({ ...data[0], id: data[0]._id });
+                let data = await db.collection("games").find({ gameId: gameId }).toArray();
+                let game = new Game({ ...data[0], gameId: data[0].gameId });
                 resolve(game);
             } catch (err) {
-                reject(`Game ${id} not found`);
+                reject(`Game ${gameId} not found`);
             };
         });
     };
@@ -57,14 +58,14 @@ class Game {
             try {
                 const db = await init();
                 const data = await db.collection("games").find(
-                    { _id: ObjectId(this.id) },
+                    { gameId: this.gameId },
                     {
                         "players":
                             { "name": name, "score": 0 }
                     }
                 ).toArray();
                 const index = data[0].players.findIndex(i => i.name === name);
-                const player = new Game({ _id: ObjectId(this.id), players: data[0].players[index] });
+                const player = new Game({ gameId: this.gameId, players: data[0].players[index] });
                 resolve(player);
             } catch (err) {
                 reject(`Error retrieving player ${name}`);
@@ -73,11 +74,11 @@ class Game {
     };
 
     // Create new game
-    static createGame(difficulty, category, players) {
+    static createGame(gameId, difficulty, category, players) {
         return new Promise(async (resolve, reject) => {
             try {
                 const db = await init();
-                let gameData = await db.collection('games').insertOne({ difficulty: difficulty, category: category, players: players });
+                let gameData = await db.collection('games').insertOne({ gameId: gameId, difficulty: difficulty, category: category, players: players });
                 let newGame = new Game(gameData.ops[0]);
                 resolve(newGame);
             } catch (err) {
@@ -91,7 +92,7 @@ class Game {
         return new Promise(async (resolve, reject) => {
             try {
                 const db = await init();
-                let playerData = await db.collection('games').updateOne({ _id: ObjectId(gameId) }, { $push: { players: { name: name, score: 0 } } });
+                let playerData = await db.collection('games').updateOne({ gameId: gameId }, { $push: { players: { name: name, score: 0 } } });
                 let newPlayer = new Game(playerData.ops[0]);
                 resolve(newPlayer);
             } catch (err) {
@@ -142,10 +143,10 @@ class Game {
         return new Promise(async (resolve, reject) => {
             try {
                 const db = await init();
-                await db.collection("games").deleteOne({ _id: ObjectId(this.id) });
-                resolve(`Game ${this.id} has been deleted`);
+                await db.collection("games").deleteOne({ gameId: this.gameId });
+                resolve(`Game ${this.gameId} has been deleted`);
             } catch (err) {
-                reject(`Game ${this.id} could not be deleted`);
+                reject(`Game ${this.gameId} could not be deleted`);
             };
         });
     };
