@@ -4,11 +4,11 @@ const gamesController = require("../controllers/games");
 
 router.get("/", gamesController.index);
 router.get("/players", gamesController.indexPlayers)
-router.get("/:id", gamesController.show);
-router.get("/:id/:name", gamesController.showPlayer);
+router.get("/:gameId", gamesController.show);
+router.get("/:gameId/:name", gamesController.showPlayer);
 router.post("/", gamesController.create);
-router.post("/:id", gamesController.createPlayer);
-router.put("/:id/:name", gamesController.updateScore)
-router.delete("/:id", gamesController.destroy);
+router.post("/:gameId", gamesController.createPlayer);
+router.put("/:gameId/:name", gamesController.updateScore)
+router.delete("/:gameId", gamesController.destroy);
 
 module.exports = router;

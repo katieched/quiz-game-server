@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+const app = express();
 
-const { app, server, io, initialise } = require("./socket/server");
+// const { app, server, io, initialise } = require("./socket/server");
 
 app.use(cors());
 app.use(express.json());
@@ -12,6 +13,6 @@ const gamesRoutes = require("./routes/games");
 
 app.use("/games", gamesRoutes);
 
-io.on("connection", socket => initialise(socket));
+// io.on("connection", socket => initialise(socket));
 
-module.exports = server;
+module.exports = app;

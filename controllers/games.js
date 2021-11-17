@@ -22,7 +22,7 @@ async function indexPlayers(req, res) {
 // Show routes
 async function show(req, res) {
     try {
-        const game = await Game.findById(req.params.id);
+        const game = await Game.findById(req.params.gameId);
         res.json({ Game: game });
     } catch (err) {
         res.status(404).json(err);
@@ -31,7 +31,7 @@ async function show(req, res) {
 
 async function showPlayer(req, res) {
     try {
-        const game = await Game.findById(req.params.id);
+        const game = await Game.findById(req.params.gameId);
         const player = await game.findPlayerByName(req.params.name);
         res.json({ Player: player });
     } catch(err) {
@@ -42,8 +42,8 @@ async function showPlayer(req, res) {
 // Create routes
 async function create(req, res) {
     try {
-        const { difficulty, category, players } = req.body;
-        const newGame = await Game.createGame(difficulty, category, players);
+        const { gameId, difficulty, category, players } = req.body;
+        const newGame = await Game.createGame(gameId, difficulty, category, players);
         res.status(201).json({ Game: newGame });
     } catch (err) {
         res.status(422).json(err);
@@ -53,7 +53,7 @@ async function create(req, res) {
 async function createPlayer(req, res) {
     try {
         const { name } = req.body;
-        const newPlayer = await Game.createPlayer(name, req.params.id);
+        const newPlayer = await Game.createPlayer(name, req.params.gameId);
         res.status(201).json({ Player: newPlayer });
     } catch(err) {
         res.status(422).json(err);
@@ -63,7 +63,7 @@ async function createPlayer(req, res) {
 // Update route
 async function updateScore(req, res) {
     try {
-        const game = await Game.findById(req.params.id);
+        const game = await Game.findById(req.params.gameId);
         console.log("Game", game)
         const player = await game.findPlayerByName(req.params.name);
         console.log("player", player)
@@ -78,7 +78,7 @@ async function updateScore(req, res) {
 // Delete route
 async function destroy(req, res) {
     try {
-        const gameToDelete = await Game.findById(req.params.id);
+        const gameToDelete = await Game.findById(req.params.gameId);
         await gameToDelete.destroyGame();
         res.status(204).json("Game successfully deleted");
     } catch (err) {
