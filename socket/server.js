@@ -29,16 +29,14 @@ io.on('connection', socket => {
     socket.on('create game', (roomId) => {
         console.log('created room', roomId);
         socket.join(roomId);
-    })
+    });
 
     socket.on('join game', (roomId) => {
         console.log(`joined game ${roomId.roomId}`);
         socket.join(roomId);
 
         io.in(roomId).emit('Admin', 'A new player has joined the game.');
-    })
-
-    // Join game
+    });
 
     // Update players' score
 
