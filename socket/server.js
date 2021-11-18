@@ -61,6 +61,17 @@ io.on('connection', socket => {
                     playerAnswers: {},//Object of username: answer.
                     current: true
                 },
+                {
+                    question: 'What is my age?',
+                    answers: [
+                        {prefix: 'A', answer: '12', correct: false},
+                        {prefix: 'B', answer: '14', correct: true},
+                        {prefix: 'C', answer: '28', correct: false},
+                        {prefix: 'D', answer: '23', correct: false}
+                    ],
+                    playerAnswers: {},//Object of username: answer.
+                    current: true
+                },
             ],
             isStarted: false,
             isEnded: false
