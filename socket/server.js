@@ -61,10 +61,6 @@ io.on('connection', socket => {
                     playerAnswers: [],//Object of username: answer.
                     current: true
                 },
-                // [
-                //     {username: "Bob", answer: "B"},
-                //     {username: "Tim", answer: "C"}
-                // ]
                 {
                     question: 'How old are you?',
                     answers: [
@@ -74,7 +70,7 @@ io.on('connection', socket => {
                         { prefix: 'D', answer: '12', correct: false }
                     ],
                     playerAnswers: [],//Object of username: answer.
-                    current: true
+                    current: false
                 }
             ],
             isStarted: false,
@@ -117,14 +113,38 @@ io.on('connection', socket => {
          * Somehow save scores to database
          */
 
+        //  io.to(roomId).emit('UpdateGame', allGames[roomId])
+
         allGames[roomId].questions[0].playerAnswers.push(answer);
-        /*
+        
         // If all players in the room have answered each question
         if (allGames[roomId].questions[0].playerAnswers.length === allGames[roomId].players.length) {
-
+            allGames[roomId].questions[0].current = false;
+            allGames[roomId].questions[1].current = true;
         }
-        */
-        console.log("question answered")
+
+        // If players answer is right, update the player's score
+        // let correctAnswer = allGames[roomId].questions[0].answers.find((answer) => {
+        //     return answer.correct == true;
+        // })
+
+        // for(let i=0; i < allGames[roomId].players.length; i++) {
+        //     let player = allGames[roomId].players[i].username;
+
+        //     console.log("player name:", player)
+            
+        //     let playerAnswer = allGames[roomId].questions[0].playerAnswers.find((answer) => {
+        //         return answer.username == player;
+        //     })
+        //     console.log("player's answer: ", playerAnswer);
+
+        //     // if(correctAnswer.answer === playerAnswer)
+        // }
+        
+
+        io.to(roomId).emit('UpdateGame', allGames[roomId]);
+
+        console.log("question answered");
     });
 
     socket.on("disconnect", socket => { // runs when client disconnects
