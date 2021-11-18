@@ -1,4 +1,4 @@
-const { Player } = require("../models/Player");
+const Player = require("../models/Player");
 
 // Index route
 async function index(req, res) {
