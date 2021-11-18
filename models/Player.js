@@ -41,8 +41,9 @@ class Player {
             try {
                 const db = await init();
                 let data = await db.collection("players").findOneAndUpdate(
-                    { $and: [{ gameId: gameId }, { username: username }] },
-                    { $inc: { score: 100 } }
+                    { $and: [{ gameId: { $eq: gameId } }, { username: { $eq: username } }] },
+                    { $inc: { score: 100 } },
+                    { returnNewDocument: true }
                 ).toArray();
                 let player = new Player({ ...data[0] })
                 resolve(player);
