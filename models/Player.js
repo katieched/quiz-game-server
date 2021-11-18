@@ -44,8 +44,10 @@ class Player {
                     { $and: [{ gameId: { $eq: gameId } }, { username: { $eq: username } }] },
                     { $inc: { score: 100 } },
                     { returnNewDocument: true }
-                ).toArray();
-                let player = new Player({ ...data[0] })
+                );
+                console.log(data.value)
+                let player = new Player({ ...data.value[0] })
+                console.log(player)
                 resolve(player);
             } catch (err) {
                 reject(`Player ${username} could not be updated`);
