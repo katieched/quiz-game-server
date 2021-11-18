@@ -1,4 +1,5 @@
 const { init } = require("../dbConfig");
+const fetch = require ('cross-fetch');
 
 const httpServer = require("http").createServer();
 const io = require("socket.io")(httpServer, {
@@ -35,63 +36,43 @@ io.on('connection', socket => {
          * Map each question object to an object like the one below
          */
 
-        // function generateQuestions(category, difficulty) {
-        //     fetch(`https://opentdb.com/api.php?amount=10&category=${category}&difficulty=${difficulty}&type=multiple`)
-        //         .then(resp => {
-        //             console.log(resp.json());
-        //             return resp.json();
-        //         })
-        //         .catch(console.warn)
-        // }
+        fetch(`https://opentdb.com/api.php?amount=5&category=${category}&difficulty=${difficulty}&type=multiple`)
+            .then(resp => {
+                return resp.json();
+            })
+            .then(resp => createGame(roomId, username, resp.results))
+            .catch(console.error);
+    });
 
-        // generateQuestions(category, difficulty);
-
+    const createGame = (roomId, username, questions) => {
         allGames[roomId] = {
             players: [{
                 username: username,
                 score: 0
             }],
-            questions: [
-                {
-                    question: 'What is the Capital of the United States?',
-                    answers: [
-                        {prefix: 'A', answer: 'Los Angelas, CA', correct: false},
-                        {prefix: 'B', answer: 'Washington, D.C.', correct: true},
-                        {prefix: 'C', answer: 'New York City, NY', correct: false},
-                        {prefix: 'D', answer: 'Houston, TX', correct: false}
-                    ],
-                    playerAnswers: {},//Object of username: answer.
-                    current: true
-                },
-                {
-                    question: 'How many countries does Mexico border?',
-                    answers: [
-                        { prefix: 'A', answer: '2', correct: false },
-                        { prefix: 'B', answer: '4', correct: false },
-                        { prefix: 'C', answer: '3', correct: true },
-                        { prefix: 'D', answer: '1', correct: false }
-                    ],
-                    playerAnswers: {},//Object of username: answer.
+            questions: questions.map((question) => {
+                let answers = question.incorrect_answers.map((answer) => {
+                    return {
+                        answer: answer,
+                        correct: false
+                    };
+                });
+                answers.push({answer: question.correct_answer, correct: true});
+                return {
+                    question: question.question,
+                    answers: answers,
+                    playerAnswers: {},
                     current: false
-                },
-                {
-                    question: 'The longest shared border in the world can be found between which two nations?',
-                    answers: [
-                        { prefix: 'A', answer: 'Chile and Argentina', correct: false },
-                        { prefix: 'B', answer: 'Russia and China', correct: false },
-                        { prefix: 'C', answer: 'India and Pakistan', correct: false },
-                        { prefix: 'D', answer: 'Canada and the United States', correct: true }
-                    ],
-                    playerAnswers: {},//Object of username: answer.
-                    current: false
-                }
-            ],
+                };
+            }),
             isStarted: false,
             isEnded: false
         };
 
+        allGames[roomId].questions[0].current = true;
+
         socket.emit('GameCreated');
-    })
+    }
 
     socket.on('JoinGame', (gameId, username) => {
         if(!(allGames[gameId].players.find((player) => {
