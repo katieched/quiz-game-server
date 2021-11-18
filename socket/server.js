@@ -1,6 +1,3 @@
-// const express = require("express");
-// const app = express();
-
 const httpServer = require("http").createServer();
 const io = require("socket.io")(httpServer, {
     cors: {
@@ -9,11 +6,10 @@ const io = require("socket.io")(httpServer, {
     }
 });
 
-// const { router } = require("../routes/games");
-
-
+let allGames = {};
 
 io.on('connection', socket => {
+    let roomId = '';
     console.log("'Ello, who's this we got here?"); // runs when client first connects
 
     // get total number of client connections
@@ -26,21 +22,72 @@ io.on('connection', socket => {
     // send event to all clients
     io.emit('Admin', `There are ${playersCount} players currently playing!`)
 
-    socket.on('create game', (roomId) => {
+    socket.on('CreateGame', ({gameId, username, category, difficulty}) => {
+        roomId = gameId;
         console.log('created room', roomId);
-        socket.join(roomId);
+
+        /**
+         * @todo Generate the questions
+         * Make request to trivia api
+         * Returns an array of questions
+         * Map each question object to an object like the one below
+         */
+        allGames[roomId] = {
+            players: [{
+                username: username,
+                score: 0
+            }],
+            questions: [
+                {
+                    question: 'What is my name?',
+                    answers: [
+                        {prefix: 'A', answer: 'Bob', correct: false},
+                        {prefix: 'B', answer: 'Katie', correct: true},
+                    ],
+                    playerAnswers: {},//Object of username: answer.
+                    current: true
+                },
+            ],
+            isStarted: false,
+            isEnded: false
+        };
+
+        socket.emit('GameCreated');
     })
 
-    socket.on('join game', (roomId) => {
-        console.log(`joined game ${roomId.roomId}`);
+    socket.on('JoinGame', (gameId, username) => {
+        if(!(allGames[gameId].players.find((player) => {
+            return player.username == username;
+        }))) {
+            allGames[gameId].players.push({
+                username: username,
+                score: 0
+            })
+        }
+        roomId = gameId;
+        console.log(`joined game ${roomId}`);
+
         socket.join(roomId);
+        io.to(roomId).emit('UpdateGame', allGames[roomId]);
 
-        io.in(roomId).emit('Admin', 'A new player has joined the game.');
-    })
+    });
 
-    // Join game
+    socket.on('StartGameServer', () => {
+        console.log(allGames);
+        if (!allGames[roomId]) return;
+        io.to(roomId).emit('StartGame');
+        allGames[roomId].isStarted = true;
+    });
 
-    // Update players' score
+    socket.on('AnswerQuestion', (answer) => {
+        /** 
+         * @todo Add the answer/score when the Q is answered
+         * Change score in allGames array
+         * If it's the last question and everybody has answered, end the game
+         * io.to(roomId).emit('EndGame');
+         * Somehow save scores to database
+         */
+    });
 
     socket.on("disconnect", socket => { // runs when client disconnects
         console.log("K bye then");
