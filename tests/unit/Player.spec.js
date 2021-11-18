@@ -13,21 +13,22 @@ describe("Player", () => {
             let dbName = process.env.TEST_UNIT_DB_NAME;
             client = await mongoClient.connect();
             db = await client.db(dbName);
+            await sleep(5);
         }
         catch (err) {
             console.log(err);
         };
     });
 
-    // afterAll(async () => {
-    //     await client.close();
-    //     await db.close();
-    // });
+    afterAll(async () => {
+        await client.close();
+    });
 
     describe("all", () => {
         test("It resolves with all players on a successful db query", async () => {
             const mockPlayer = { gameId: "abc12", username: "User1", score: 100 };
             await db.collection("unitPlayers").insertOne(mockPlayer);
+            console.log(db.collection("unitPlayers").find())
             const all = await Player.all;
             expect(all.Players).toHaveLength(1);
             expect(all.Players[0].gameId).toBe("abc12");

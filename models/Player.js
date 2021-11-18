@@ -45,9 +45,7 @@ class Player {
                     { $inc: { score: 100 } },
                     { returnNewDocument: true }
                 );
-                console.log(data.value)
-                let player = new Player({ ...data.value[0] })
-                console.log(player)
+                let player = new Player({ ...data.value })
                 resolve(player);
             } catch (err) {
                 reject(`Player ${username} could not be updated`);
