@@ -94,7 +94,6 @@ io.on('connection', socket => {
 
         socket.join(roomId);
         io.to(roomId).emit('UpdateGame', allGames[roomId]);
-
     });
 
     socket.on('StartGameServer', () => {
