@@ -58,20 +58,24 @@ io.on('connection', socket => {
                         {prefix: 'C', answer: 'Sally', correct: false},
                         {prefix: 'D', answer: 'Tim', correct: false}
                     ],
-                    playerAnswers: {},//Object of username: answer.
+                    playerAnswers: [],//Object of username: answer.
                     current: true
                 },
+                // [
+                //     {username: "Bob", answer: "B"},
+                //     {username: "Tim", answer: "C"}
+                // ]
                 {
-                    question: 'What is my age?',
+                    question: 'How old are you?',
                     answers: [
-                        {prefix: 'A', answer: '12', correct: false},
-                        {prefix: 'B', answer: '14', correct: true},
-                        {prefix: 'C', answer: '28', correct: false},
-                        {prefix: 'D', answer: '23', correct: false}
+                        { prefix: 'A', answer: '13', correct: false },
+                        { prefix: 'B', answer: '43', correct: true },
+                        { prefix: 'C', answer: '18', correct: false },
+                        { prefix: 'D', answer: '12', correct: false }
                     ],
-                    playerAnswers: {},//Object of username: answer.
+                    playerAnswers: [],//Object of username: answer.
                     current: true
-                },
+                }
             ],
             isStarted: false,
             isEnded: false
@@ -103,6 +107,7 @@ io.on('connection', socket => {
         allGames[roomId].isStarted = true;
     });
 
+    // answer = {username: "Bob", answer: "C"}
     socket.on('AnswerQuestion', (answer) => {
         /** 
          * @todo Add the answer/score when the Q is answered
@@ -111,6 +116,15 @@ io.on('connection', socket => {
          * io.to(roomId).emit('EndGame', ...);
          * Somehow save scores to database
          */
+
+        allGames[roomId].questions[0].playerAnswers.push(answer);
+        /*
+        // If all players in the room have answered each question
+        if (allGames[roomId].questions[0].playerAnswers.length === allGames[roomId].players.length) {
+
+        }
+        */
+        console.log("question answered")
     });
 
     socket.on("disconnect", socket => { // runs when client disconnects
