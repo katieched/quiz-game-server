@@ -32,6 +32,18 @@ io.on('connection', socket => {
          * Returns an array of questions
          * Map each question object to an object like the one below
          */
+
+        // function generateQuestions(category, difficulty) {
+        //     fetch(`https://opentdb.com/api.php?amount=10&category=${category}&difficulty=${difficulty}&type=multiple`)
+        //         .then(resp => {
+        //             console.log(resp.json());
+        //             return resp.json();
+        //         })
+        //         .catch(console.warn)
+        // }
+
+        // generateQuestions(category, difficulty);
+
         allGames[roomId] = {
             players: [{
                 username: username,
@@ -43,6 +55,8 @@ io.on('connection', socket => {
                     answers: [
                         {prefix: 'A', answer: 'Bob', correct: false},
                         {prefix: 'B', answer: 'Katie', correct: true},
+                        {prefix: 'C', answer: 'Sally', correct: false},
+                        {prefix: 'D', answer: 'Tim', correct: false}
                     ],
                     playerAnswers: {},//Object of username: answer.
                     current: true
@@ -62,7 +76,7 @@ io.on('connection', socket => {
             allGames[gameId].players.push({
                 username: username,
                 score: 0
-            })
+            });
         }
         roomId = gameId;
         console.log(`joined game ${roomId}`);
@@ -84,7 +98,7 @@ io.on('connection', socket => {
          * @todo Add the answer/score when the Q is answered
          * Change score in allGames array
          * If it's the last question and everybody has answered, end the game
-         * io.to(roomId).emit('EndGame');
+         * io.to(roomId).emit('EndGame', ...);
          * Somehow save scores to database
          */
     });
