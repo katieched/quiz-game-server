@@ -1,3 +1,5 @@
+const { init } = require("../dbConfig");
+
 const httpServer = require("http").createServer();
 const io = require("socket.io")(httpServer, {
     cors: {
@@ -51,25 +53,36 @@ io.on('connection', socket => {
             }],
             questions: [
                 {
-                    question: 'What is my name?',
+                    question: 'What is the Capital of the United States?',
                     answers: [
-                        {prefix: 'A', answer: 'Bob', correct: false},
-                        {prefix: 'B', answer: 'Katie', correct: true},
-                        {prefix: 'C', answer: 'Sally', correct: false},
-                        {prefix: 'D', answer: 'Tim', correct: false}
+                        {prefix: 'A', answer: 'Los Angelas, CA', correct: false},
+                        {prefix: 'B', answer: 'Washington, D.C.', correct: true},
+                        {prefix: 'C', answer: 'New York City, NY', correct: false},
+                        {prefix: 'D', answer: 'Houston, TX', correct: false}
                     ],
-                    playerAnswers: [],//Object of username: answer.
+                    playerAnswers: {},//Object of username: answer.
                     current: true
                 },
                 {
-                    question: 'How old are you?',
+                    question: 'How many countries does Mexico border?',
                     answers: [
-                        { prefix: 'A', answer: '13', correct: false },
-                        { prefix: 'B', answer: '43', correct: true },
-                        { prefix: 'C', answer: '18', correct: false },
-                        { prefix: 'D', answer: '12', correct: false }
+                        { prefix: 'A', answer: '2', correct: false },
+                        { prefix: 'B', answer: '4', correct: false },
+                        { prefix: 'C', answer: '3', correct: true },
+                        { prefix: 'D', answer: '1', correct: false }
                     ],
-                    playerAnswers: [],//Object of username: answer.
+                    playerAnswers: {},//Object of username: answer.
+                    current: false
+                },
+                {
+                    question: 'The longest shared border in the world can be found between which two nations?',
+                    answers: [
+                        { prefix: 'A', answer: 'Chile and Argentina', correct: false },
+                        { prefix: 'B', answer: 'Russia and China', correct: false },
+                        { prefix: 'C', answer: 'India and Pakistan', correct: false },
+                        { prefix: 'D', answer: 'Canada and the United States', correct: true }
+                    ],
+                    playerAnswers: {},//Object of username: answer.
                     current: false
                 }
             ],
@@ -103,48 +116,57 @@ io.on('connection', socket => {
         allGames[roomId].isStarted = true;
     });
 
+    let questionNumber = 0;
     // answer = {username: "Bob", answer: "C"}
-    socket.on('AnswerQuestion', (answer) => {
-        /** 
-         * @todo Add the answer/score when the Q is answered
-         * Change score in allGames array
-         * If it's the last question and everybody has answered, end the game
-         * io.to(roomId).emit('EndGame', ...);
-         * Somehow save scores to database
-         */
+    socket.on('AnswerQuestion', async ({username, answer}) => {
+        console.log("question answered");
 
-        //  io.to(roomId).emit('UpdateGame', allGames[roomId])
-
-        allGames[roomId].questions[0].playerAnswers.push(answer);
+        allGames[roomId].questions[questionNumber].playerAnswers[username] = answer;
         
-        // If all players in the room have answered each question
-        if (allGames[roomId].questions[0].playerAnswers.length === allGames[roomId].players.length) {
-            allGames[roomId].questions[0].current = false;
-            allGames[roomId].questions[1].current = true;
+        // If not all players in the room have answered each question
+        if (Object.keys(allGames[roomId].questions[questionNumber].playerAnswers).length < allGames[roomId].players.length) {
+            console.log()
+            return;
         }
 
-        // If players answer is right, update the player's score
-        // let correctAnswer = allGames[roomId].questions[0].answers.find((answer) => {
-        //     return answer.correct == true;
-        // })
+        allGames[roomId].questions[questionNumber].current = false;
 
-        // for(let i=0; i < allGames[roomId].players.length; i++) {
-        //     let player = allGames[roomId].players[i].username;
-
-        //     console.log("player name:", player)
+        //If there are no more questions, end the game
+        if (!allGames[roomId].questions[questionNumber + 1]) {
+            try {
+                const db = await init();
+                db.collection("players").insertMany(allGames[roomId].players.map((player) => {
+                    return {
+                        gameId: roomId,
+                        username: player.username,
+                        score: player.score
+                    };
+                }));
+            } catch (err) {
+                console.error(err);
+            }
             
-        //     let playerAnswer = allGames[roomId].questions[0].playerAnswers.find((answer) => {
-        //         return answer.username == player;
-        //     })
-        //     console.log("player's answer: ", playerAnswer);
+            console.log('Ending game');
+            io.to(roomId).emit('EndGame', allGames[roomId]);
+            return;
+        }
 
-        //     // if(correctAnswer.answer === playerAnswer)
-        // }
-        
+        // If player's answer is right, update the player's score
+        let correctAnswer = allGames[roomId].questions[questionNumber].answers.find((answer) => {
+            return answer.correct == true;
+        }).answer;
 
+        for (let [username, answer] of Object.entries(allGames[roomId].questions[questionNumber].playerAnswers)) {
+            if (correctAnswer == answer) {
+                allGames[roomId].players.find((player) => {
+                    return player.username == username;
+                }).score += 100;
+            }
+        }
+
+        allGames[roomId].questions[questionNumber + 1].current = true;
+        questionNumber++;
         io.to(roomId).emit('UpdateGame', allGames[roomId]);
-
-        console.log("question answered");
     });
 
     socket.on("disconnect", socket => { // runs when client disconnects
