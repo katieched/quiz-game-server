@@ -24,7 +24,7 @@ async function show(req, res) {
 async function update(req, res) {
     try {
         const player = await Player.updateScore(req.params.gameId, req.params.username);
-        res.status(204).json(player);
+        res.status(200).json({ player });
     } catch (err) {
         res.status(400).json(err);
     };
