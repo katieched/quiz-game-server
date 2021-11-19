@@ -1,14 +1,14 @@
 const express = require("express");
 const cors = require("cors");
+const app = express();
 
-const server = express();
-server.use(cors());
-server.use(express.json());
+app.use(cors());
+app.use(express.json());
 
-server.get('/', (req, res) => res.send('Welcome to the quiz game!'));
+app.get('/', (req, res) => res.send('Welcome to the quiz game!'));
 
-const gamesRoutes = require("./routes/games");
+const playersRoutes = require("./routes/players");
 
-server.use("/games", gamesRoutes);
+app.use("/players", playersRoutes);
 
-module.exports = server;
+module.exports = app;
