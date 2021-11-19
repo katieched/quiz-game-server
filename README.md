@@ -4,7 +4,7 @@ Quizkaban is an online quiz game, where users can play with others on a quiz bas
 
 This README will guide you through how to setup the client side of the application and our experiences during this project.
 
-The repo for the client side of the application can be found [here](https://github.com/saja-aabith/lap3-quizgame-client-two). 
+The repo for the client side of the application can be found [here](https://github.com/saja-aabith/lap3-quizgame-client-two). The website can be accessed [here](https://quizkaban.netlify.app/).
 
 ## Installation & Usage
 
