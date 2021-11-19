@@ -60,7 +60,3 @@ The repo for the client side of the application can be found [here](https://gith
 
 * Add a chat feature to the lobby with socket.io while the players wait for the game to start.
 * Add an introductory page to let the users know how the quiz application works.
-
-## Bugs
-
-* The function to update the player's score on the server side seems to give an error related to the `ops` method.
